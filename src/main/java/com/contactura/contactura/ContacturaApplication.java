@@ -1,14 +1,7 @@
 package com.contactura.contactura;
 
-import java.util.stream.LongStream;
-
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.Bean;
-
-import com.contactura.contactura.model.Contactura;
-import com.contactura.contactura.repository.ContacturaRepository;
 
 @SpringBootApplication
 public class ContacturaApplication {

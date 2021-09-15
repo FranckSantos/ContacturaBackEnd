@@ -1,5 +1,9 @@
 package com.contactura.contactura.controller;
 
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.Base64;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -18,7 +22,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.contactura.contactura.model.Contactura;
 import com.contactura.contactura.model.ContacturaUser;
 import com.contactura.contactura.repository.ContacturaUserRepository;
 
@@ -32,20 +35,45 @@ public class ContacturaControllerUser {
 	
 	@RequestMapping("/login")
 	@GetMapping
-	public String login(HttpServletRequest request) {
-		String token = request.getHeader("Authorization")
-				.substring("Basic".length()).trim();
-		return token;
+	/*
+	 * public String login(HttpServletRequest request) { String token =
+	 * request.getHeader("Authorization") .substring("Basic".length()).trim();
+	 * return token; }
+	 */
+	public List<String> login(HttpServletRequest request) throws UnsupportedEncodingException {
+		//String t0 = request.;
+		//System.out.println(t0);
+		
+		/*
+		 * String t1 = request.getHeader("Authorization"); System.out.println(t1);
+		 * String t2 = request.getHeader("Authorization").substring("Basic".length());
+		 * System.out.println(t2);
+		 */
+//		ESTUDO DE CRIPTOGRAFIA
+//		byte[] bytes = "turma da neuro é top!".getBytes("UTF-8");
+//		String usernameEncodedString = Base64.getEncoder().encodeToString(bytes);
+//		byte[] decoded = Base64.getDecoder().decode(usernameEncoded);
+//		System.out.println(new String(decoded, StandardCharsets.UTF_8));
+		
+		String authorization = request.getHeader("Authorization").substring("Basic".length()).trim();
+		byte[] baseCred = Base64.getDecoder().decode(authorization);
+		String credentialsParsed = new String(baseCred, StandardCharsets.UTF_8);
+		String[] values = credentialsParsed.split(":", 2);
+		ContacturaUser user = repository.findByUsername(values[0]);
+		
+		String token = request.getHeader("Authorization").substring("Basic".length()).trim();
+		
+		return Arrays.asList(Boolean.toString(user.getAdmin()), token);
 	}
 	
 //  List All - http://localhost:8095/contacturauser	
 	@GetMapping
-	public List findAll() {
+	public List<?> findAll() {
 		return repository.findAll();
 	}
 
 	
-//  Find By Id - http://localhost:8095/contactura/{id}
+//  Find By Id - http://localhost:8095/user/{id}
 	@GetMapping(value = "{id}")
 	public ResponseEntity<?> findById(@PathVariable long id) {
 		return repository.findById(id)
@@ -53,7 +81,7 @@ public class ContacturaControllerUser {
 				.orElse(ResponseEntity.notFound().build());
 				
 	}
-//  Create - http://localhost:8095/contactura
+//  Create - 
 	@PostMapping
 	@PreAuthorize("hasRole('ADMIN')")
 	public ContacturaUser create(@RequestBody ContacturaUser user) {
@@ -77,7 +105,7 @@ public class ContacturaControllerUser {
 				}).orElse(ResponseEntity.notFound().build());
 	}
 	
-// Delete - http://localhost:8095/contactura/{id}
+// Delete - http://localhost:8095/user/{id}
 	@DeleteMapping(path = {"/{id}"})
 	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<?> delete(@PathVariable long id) {
